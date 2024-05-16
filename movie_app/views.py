@@ -105,6 +105,7 @@ def home(request):
     genres = ['Action', 'Comedy', 'Drama', 'Horror']  # Example list of genres
     genre_movies = {genre: [movie for movie in all_movies if genre in movie.get('genres', [])] for genre in genres} 
     years = list(range(1999, 2025))
+    print(movies)
 
     report_graph_path = None
 

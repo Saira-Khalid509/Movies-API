@@ -163,22 +163,23 @@
 <style>
     .buttons {
     display: flex;
-    }
+        }
 
-    .watch-button,
-    .download-button {
-        display: inline-block;
-        padding: 8px 16px;
-        text-decoration: none;
-        color: black;
-        border-radius: 5px;
-        margin-right: 10px;
-    }
+        .watch-button,
+        .download-button {
+            display: inline-block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: black;
+            border-radius: 5px;
+            margin-right: 10px;
+            background-color: #949090c9;
+        }
 
-    .watch-button:hover,
-    .download-button:hover {
-        background-color: #f2f2f2;
-    }
+        .watch-button:hover,
+        .download-button:hover {
+            background-color: #f2f2f2;
+        }
 
 </style>
 
@@ -202,8 +203,9 @@
                         <p><strong>Runtime:</strong> {{ movie.runtime }}</p>
                         <p><strong>Summary:</strong> {{ movie.summary }}</p>
                         <div class="buttons">
-                            <a href="{{ movie.url }}" class="watch-button">Watch Online</a> <!-- Link to watch the movie online -->
-                            <a href="{{ movie.download_url }}" class="download-button" download="{{ movie.title }}.mp4">Download</a> <!-- Add download button -->
+                            <a href="{{ movie_watch_url }}" class="watch-button">Watch Online</a>
+                            <a href="{{ movie_download_url }}" class="download-button" download="{{ movie.title }}.mp4">Download</a>
+ <!-- Add download button -->
                         </div>
                     </div>
                 </li>
