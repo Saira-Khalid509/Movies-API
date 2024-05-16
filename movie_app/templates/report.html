@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Report</title>
+    <style>
+        /* Center the image */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .graph-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Set height to occupy full viewport height */
+            background-color: #f0f0f0; /* Add a background color */
+            padding: 20px; /* Add some padding */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333; /* Darken the heading color */
+        }
+
+        /* Adjust the width of the image */
+        .graph-container img {
+            width: 100%; /* Set width to 100% of parent container */
+            height: auto; /* Maintain aspect ratio */
+            max-width: 1000px; /* Limit maximum width of the graph */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        }
+
+        /* Style for genre labels */
+        .genre-labels {
+            text-align: center;
+            margin-top: 20px; /* Add some space above the genre labels */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .genre-label {
+            display: inline-block;
+            margin: 0 10px; /* Add some space between genre labels */
+            font-size: 14px;
+            color: #311010; /* Lighten the text color */
+            transform: rotate(-45deg); /* Rotate the text */
+            transform-origin: center; /* Set rotation origin */
+        }
+    </style>
+</head>
+<body>
+    <h1>Movie Report</h1>
+    <div class="graph-container">
+        <img src="{{ plot_data_uri }}" alt="Movie Report">
+    </div>
+    <div class="genre-labels">
+        {% for genre in genres %}
+            <span class="genre-label">{{ genre }}</span>
+        {% endfor %}
+    </div>
+</body>
+</html>

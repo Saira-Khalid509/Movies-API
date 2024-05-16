@@ -1,0 +1,355 @@
+{% load static %}
+{% load pagination_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .filters select, .filters button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 16px;
+        }
+        .filters button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .filters button:hover {
+            background-color: #0056b3;
+        }
+        .sidebar {
+            width: 150px;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;    
+            padding: 30px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            transition: width 0.5s;
+        }
+        .sidebar ul {
+            padding: 0 20px;
+            list-style: none;
+        }
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar ul li img {
+            width: 60px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .sidebar ul li a {
+            color: #0c0b0b;
+            text-decoration: none;
+            font-size: 15px;
+            display: inline-block;
+        }
+        .movie-list {
+            list-style: none;
+            padding: 0;
+            margin-left: 40px;
+        }
+        .movie-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            background-color: #ffffffbe;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+        }
+        
+
+        .movie-image {
+            margin-right: 20px;
+            width: 150px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .movie-details {
+            flex-grow: 1;
+        }
+        .movie-details h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 10px;
+            
+        }
+        .movie-details p {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .movie-link {
+            text-decoration: none; 
+            color: inherit; 
+        }
+        
+    </style>
+
+
+
+
+</head>
+<body>
+    <div class="container">
+        <div class="filters">
+            <select id="genre-filter">
+                <option value="">All Genres</option>
+                {% for genre in genres %}
+                    <option value="{{ genre }}">{{ genre }}</option>
+                {% endfor %}
+            </select>
+            <select id="year-filter">
+                <option value="">All Years</option>
+                {% for year in years %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="applyFilters()">Apply Filters</button>
+        </div>
+
+
+
+
+
+
+        <div class="sidebar">
+            <!-- <h2>Sidebar</h2> -->
+            <ul>
+                <li><img src="{% static 'images/top.png' %}"><a href="#">Top Rated Movies</a></li>
+                <li><img src="{% static 'images/soon.png' %}"><a href="#">Coming Soon</a></li>
+                <li><img src="{% static 'images/new.png' %}"><a href="#">New Releases</a></li>
+                <li><img src="{% static 'images/fav.png' %}"><a href="#">Favorites</a></li>
+                <li><img src="{% static 'images/later.png' %}"><a href="#">Watch Later</a></li>
+                <li><img src="{% static 'images/report_gen.png' %}"><a href="{% url 'report' %}">Report</a></li>
+                <li><img src="{% static 'images/logout.png' %}"><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </div>
+
+<style>
+    .buttons {
+    display: flex;
+    }
+
+    .watch-button,
+    .download-button {
+        display: inline-block;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: black;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+
+    .watch-button:hover,
+    .download-button:hover {
+        background-color: #f2f2f2;
+    }
+
+</style>
+
+
+
+
+
+        <ul class="movie-list">
+            {% for movie in movies %}
+                <li class="movie-item">
+                    
+                        <img src="{{ movie.medium_cover_image }}" alt="{{ movie.title }} Cover" class="movie-image">
+                                       <div class="movie-details">
+                        <h2>{{ movie.title }}</a></h2>
+                        <p><strong>Year:</strong> {{ movie.year }}</p>
+                        <p><strong>Rating:</strong> {{ movie.rating }}</p>
+                        <p><strong>Genre:</strong> {{ movie.genres |join:", " }}</p>
+                        <p><strong>Size:</strong> {{ movie.size  }}</p>
+                        <p><strong>Date Uploaded:</strong> {{ movie.date_uploaded }}</p>
+                        <p><strong>Quality:</strong> {{ movie.quality }}</p>
+                        <p><strong>Runtime:</strong> {{ movie.runtime }}</p>
+                        <p><strong>Summary:</strong> {{ movie.summary }}</p>
+                        <div class="buttons">
+                            <a href="{{ movie.url }}" class="watch-button">Watch Online</a> <!-- Link to watch the movie online -->
+                            <a href="{{ movie.download_url }}" class="download-button" download="{{ movie.title }}.mp4">Download</a> <!-- Add download button -->
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+<style>
+    .pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination {
+    position: fixed;
+    right: 0%; /* Center horizontally */
+    bottom: 0px; /* Adjust as needed */
+    /* transform: translateX(-50%); Center horizontally */
+    width: auto;
+    background-color: #f9f9f9;
+    padding: 10px 0;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.pagination a,
+.pagination .current,
+.pagination span {
+    padding: 8px 16px;
+    text-decoration: none;
+    color: black;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+}
+
+.pagination a:hover {
+    background-color: #f2f2f2;
+}
+
+</style>
+
+
+    <div class="pagination" style="text-align: right;">
+        <span class="step-links">
+            {% if movies.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ movies.previous_page_number }}">previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ movies.number }} of {{ movies.paginator.num_pages }}.
+            </span>
+    
+            {% if movies.has_next %}
+                <a href="?page={{ movies.next_page_number }}">next</a>
+                <a href="?page={{ movies.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+
+
+
+        <script>
+            // Function to fetch genres from backend and populate dropdown
+            function fetchGenres() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/genres/', true);  // URL should point to your Django view that returns genres
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            var genres = JSON.parse(xhr.responseText);
+                            populateDropdown('genre-filter', genres);
+                        } else {
+                            console.error('Error fetching genres:', xhr.status);
+                        }
+                    }
+                };
+                xhr.send();
+            }
+    
+            // Function to fetch and populate sort options
+            function fetchSortOptions() {
+                var sortOptions = ['Year', 'Rating']; // Example sort options
+                populateDropdown('sort-by', sortOptions);
+            }
+    
+            // Function to populate a dropdown menu with options
+            function populateDropdown(elementId, options) {
+                var dropdown = document.getElementById(elementId);
+                options.forEach(function(option) {
+                    var optionElement = document.createElement('option');
+                    optionElement.value = option.toLowerCase();
+                    optionElement.textContent = option;
+                    dropdown.appendChild(optionElement);
+                });
+            }
+    
+            // Function to apply filters when button is clicked
+            function applyFilters() {
+                var genre = document.getElementById('genre-filter').value;
+                var sortBy = document.getElementById('sort-by').value;
+                // Make AJAX request to fetch filtered/sorted movies
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/movies/?genre=' + genre + '&sort_by=' + sortBy, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            // Update movie list with received data
+                            var movies = JSON.parse(xhr.responseText);
+                            displayMovies(movies);
+                        } else {
+                            console.error('Error fetching movie data:', xhr.status);
+                        }
+                    }
+                };
+                xhr.send();
+            }
+    
+            // Function to display movies in the list
+            function displayMovies(movies) {
+                var moviesList = document.getElementById('movies-list');
+                moviesList.innerHTML = ''; // Clear existing movie list
+                movies.forEach(function(movie) {
+                    var li = document.createElement('li');
+                    li.textContent = movie.title + ' - Year: ' + movie.year + ', Rating: ' + movie.rating;
+                    moviesList.appendChild(li);
+                });
+            }
+    
+            // Fetch genres and sort options when page loads
+            fetchGenres();
+            fetchSortOptions();
+        </script>
+    
+
+        <!-- <script>
+            // Toggle dropdown menu visibility on button click
+            document.querySelectorAll('.dropdown').forEach(function(dropdown) {
+                dropdown.addEventListener('click', function(event) {
+                    var dropdownContent = dropdown.querySelector('.dropdown-content');
+                    dropdownContent.style.display = (dropdownContent.style.display === 'block') ? 'none' : 'block';
+                });
+            });
+        </script>    -->
+</body>
+</html>
