@@ -3,18 +3,17 @@ from django.db import models
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
-    year = models.PositiveIntegerField()
-    rating = models.DecimalField(max_digits=3, decimal_places=1)
-    genres = models.CharField(max_length=100)
-    url = models.URLField()
-    summary = models.TextField()
-    size = models.CharField(max_length=20)
+    medium_cover_image = models.URLField()
+    year = models.IntegerField()
+    rating = models.FloatField()
+    genres = models.CharField(max_length=255)
+    size = models.CharField(max_length=50)
     date_uploaded = models.DateTimeField()
+    quality = models.CharField(max_length=50)
     runtime = models.IntegerField()
-    quality = models.CharField(max_length=20)
-    medium_cover_image = models.ImageField()
-    large_cover_image = models.ImageField()
-    small_cover_image = models.ImageField()
+    summary = models.TextField()
+    file_path = models.CharField(max_length=255)  # or models.FileField(upload_to='movies/')
+
 
     def __str__(self):
         return self.title

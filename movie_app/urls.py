@@ -14,6 +14,10 @@ urlpatterns = [
     path("", views.register, name="register"),
     path("home/", views.home, name="home"),
     path('logout', views.logout, name='logout'),
+    path('filter_movies/', views.filter_movies, name='filter_movies'),
+    path('download/<int:movie_id>/', views.download_movie, name='download_movie'),
+
+
     
             ]
 

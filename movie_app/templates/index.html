@@ -13,38 +13,6 @@
             padding: 0;
             background-color: #f8f9fa;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .filters {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .filters select, .filters button {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            font-size: 16px;
-        }
-        .filters button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .filters button:hover {
-            background-color: #0056b3;
-        }
         .sidebar {
             width: 150px;
             height: 100%;
@@ -123,6 +91,47 @@
 
 
 
+
+<style>
+    .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .filters {
+        display: flex;
+        justify-content: flex-end; /* Align buttons to the end of the container */
+        align-items: center;
+        margin-bottom: 30px;
+    }
+       
+        .filters select, .filters button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 16px;
+            margin-left: 5px; /* Add margin between the select and button */
+        }
+        .filters button {
+            padding: 10px 20px; /* Adjust padding for the buttons */
+            margin-left: 10px; 
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .filters button:hover {
+            background-color: #0057b328;
+        }
+
+</style>
 </head>
 <body>
     <div class="container">
@@ -141,6 +150,59 @@
             </select>
             <button onclick="applyFilters()">Apply Filters</button>
         </div>
+        <script>
+            function applyFilters() {
+                // Get selected values from the dropdowns
+                const genre = document.getElementById('genre-filter').value;
+                const year = document.getElementById('year-filter').value;
+        
+                // Create an AJAX request
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `/filter_movies/?genre=${genre}&year=${year}`, true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            const movies = JSON.parse(xhr.responseText);
+                            displayMovies(movies);
+                        } else {
+                            console.error('Error fetching movies:', xhr.status);
+                        }
+                    }
+                };
+                xhr.send();
+            }
+        
+            // Function to display movies in the list
+            function displayMovies(movies) {
+                const moviesList = document.querySelector('.movie-list');
+                moviesList.innerHTML = ''; // Clear existing movie list
+                movies.forEach(function (movie) {
+                    const li = document.createElement('li');
+                    li.className = 'movie-item';
+                    li.innerHTML = `
+                        <img src="${movie.medium_cover_image}" alt="${movie.title} Cover" class="movie-image">
+                        <div class="movie-details">
+                            <h2>${movie.title}</h2>
+                            <p><strong>Year:</strong> ${movie.year}</p>
+                            <p><strong>Rating:</strong> ${movie.rating}</p>
+                            <p><strong>Genre:</strong> ${movie.genres.join(", ")}</p>
+                            <p><strong>Size:</strong> ${movie.size}</p>
+                            <p><strong>Date Uploaded:</strong> ${movie.date_uploaded}</p>
+                            <p><strong>Quality:</strong> ${movie.quality}</p>
+                            <p><strong>Runtime:</strong> ${movie.runtime}</p>
+                            <p><strong>Summary:</strong> ${movie.summary}</p>
+                            <div class="buttons">
+                                <a href="${movie.watch_url}" class="watch-button">Watch Online</a>
+                                <a href="${movie.download_url}" class="download-button" download="${movie.title}.mp4">Download</a>
+                            </div>
+                        </div>
+                    `;
+                    moviesList.appendChild(li);
+                });
+            }
+        </script>
+        
+
 
 
 
@@ -204,14 +266,21 @@
                         <p><strong>Summary:</strong> {{ movie.summary }}</p>
                         <div class="buttons">
                             <a href="{{ movie_watch_url }}" class="watch-button">Watch Online</a>
-                            <a href="{{ movie_download_url }}" class="download-button" download="{{ movie.title }}.mp4">Download</a>
- <!-- Add download button -->
+                            <a href="{% url 'download_movie' movie.id %}" class="download-button">Download</a>
                         </div>
                     </div>
                 </li>
             {% endfor %}
         </ul>
     </div>
+
+
+
+
+
+
+
+
 
 <style>
     .pagination {
@@ -245,10 +314,7 @@
 .pagination a:hover {
     background-color: #f2f2f2;
 }
-
 </style>
-
-
     <div class="pagination" style="text-align: right;">
         <span class="step-links">
             {% if movies.has_previous %}
@@ -305,46 +371,14 @@
                     dropdown.appendChild(optionElement);
                 });
             }
-    
-            // Function to apply filters when button is clicked
-            function applyFilters() {
-                var genre = document.getElementById('genre-filter').value;
-                var sortBy = document.getElementById('sort-by').value;
-                // Make AJAX request to fetch filtered/sorted movies
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/movies/?genre=' + genre + '&sort_by=' + sortBy, true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            // Update movie list with received data
-                            var movies = JSON.parse(xhr.responseText);
-                            displayMovies(movies);
-                        } else {
-                            console.error('Error fetching movie data:', xhr.status);
-                        }
-                    }
-                };
-                xhr.send();
-            }
-    
-            // Function to display movies in the list
-            function displayMovies(movies) {
-                var moviesList = document.getElementById('movies-list');
-                moviesList.innerHTML = ''; // Clear existing movie list
-                movies.forEach(function(movie) {
-                    var li = document.createElement('li');
-                    li.textContent = movie.title + ' - Year: ' + movie.year + ', Rating: ' + movie.rating;
-                    moviesList.appendChild(li);
-                });
-            }
-    
+            
             // Fetch genres and sort options when page loads
             fetchGenres();
             fetchSortOptions();
         </script>
     
 
-        <!-- <script>
+        <script>
             // Toggle dropdown menu visibility on button click
             document.querySelectorAll('.dropdown').forEach(function(dropdown) {
                 dropdown.addEventListener('click', function(event) {
@@ -352,6 +386,6 @@
                     dropdownContent.style.display = (dropdownContent.style.display === 'block') ? 'none' : 'block';
                 });
             });
-        </script>    -->
+        </script>   
 </body>
 </html>

@@ -6,6 +6,29 @@ import matplotlib.pyplot as plt
 import io
 import urllib
 import base64
+from django.http import JsonResponse
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from .models import Movie  # Assuming you have a Movie model
+import logging
+
+logger = logging.getLogger(__name__)
+
+def download_movie(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+    file_path = movie.file_path  # Assuming you store the file path in the Movie model
+    try:
+        response = FileResponse(open(file_path, 'rb'))
+        response['Content-Disposition'] = f'attachment; filename="{movie.title}.mp4"'
+        return response
+    except FileNotFoundError:
+        logger.error(f"File not found: {file_path}")
+        raise Http404("Movie file not found")
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
+        raise Http404("An error occurred")
+
 
 
 
@@ -63,6 +86,31 @@ def report(request):
 
     return render(request, 'report.html', {'plot_data_uri': plot_data_uri})
 
+# views.py
+
+
+def filter_movies(request):
+    genre = request.GET.get('genre', '')
+    year = request.GET.get('year', '')
+
+    movies = Movie.objects.all()
+    if genre:
+        movies = movies.filter(genres__icontains=genre)
+    if year:
+        movies = movies.filter(year=year)
+
+    movie_list = list(movies.values(
+        'title', 'medium_cover_image', 'year', 'rating', 'genres', 'size', 'date_uploaded', 'quality', 'runtime', 'summary'
+    ))
+
+    for movie in movie_list:
+        movie['genres'] = movie['genres'].split(', ')  # Assuming genres are stored as comma-separated values
+        movie['watch_url'] = f"/watch/{movie['id']}/"  # Replace with actual watch URL logic
+        movie['download_url'] = f"/download/{movie['id']}/"  # Replace with actual download URL logic
+
+    return JsonResponse(movie_list, safe=False)
+
+
 
 
 def home(request):
@@ -105,7 +153,7 @@ def home(request):
     genres = ['Action', 'Comedy', 'Drama', 'Horror']  # Example list of genres
     genre_movies = {genre: [movie for movie in all_movies if genre in movie.get('genres', [])] for genre in genres} 
     years = list(range(1999, 2025))
-    print(movies)
+    # print(movies)
 
     report_graph_path = None
 
