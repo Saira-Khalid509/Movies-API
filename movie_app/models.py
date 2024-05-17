@@ -2,17 +2,18 @@ from django.contrib.auth.models import User
 from django.db import models
 
 class Movie(models.Model):
+   class Movie(models.Model):
     title = models.CharField(max_length=255)
-    medium_cover_image = models.URLField()
-    year = models.IntegerField()
-    rating = models.FloatField()
-    genres = models.CharField(max_length=255)
-    size = models.CharField(max_length=50)
-    date_uploaded = models.DateTimeField()
-    quality = models.CharField(max_length=50)
-    runtime = models.IntegerField()
-    summary = models.TextField()
-    file_path = models.CharField(max_length=255)  # or models.FileField(upload_to='movies/')
+    medium_cover_image = models.ImageField(null=True, blank=True)  # Allow null and blank values
+    year = models.IntegerField(default=0)  # Set default value
+    rating = models.FloatField(default=0.0)  # Set default value
+    genres = models.CharField(max_length=255, null=True, blank=True)  # Allow null and blank values
+    size = models.CharField(max_length=50, null=True, blank=True)  # Allow null and blank values
+    date_uploaded = models.DateTimeField(null=True, blank=True)  # Allow null and blank values
+    quality = models.CharField(max_length=50, null=True, blank=True)  # Allow null and blank values
+    runtime = models.IntegerField(default=0)  # Set default value
+    summary = models.TextField(max_length=5000, null=True, blank=True)  # Allow null and blank values
+    file_path = models.CharField(max_length=255, null=True, blank=True)  # or models.FileField(upload_to='movies/')
 
 
     def __str__(self):

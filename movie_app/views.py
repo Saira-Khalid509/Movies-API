@@ -23,11 +23,10 @@ def download_movie(request, movie_id):
         response['Content-Disposition'] = f'attachment; filename="{movie.title}.mp4"'
         return response
     except FileNotFoundError:
-        logger.error(f"File not found: {file_path}")
         raise Http404("Movie file not found")
     except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
         raise Http404("An error occurred")
+    
 
 
 
@@ -118,7 +117,7 @@ def home(request):
 
     # Fetch all movies from the YTS API until reaching 1000 movies
     page_number = 1
-    while len(all_movies) <= 100:
+    while len(all_movies) <= 20:
         # Fetch movies for the current page
         movies_data = fetch_movies(limit=20, page=page_number)
 
@@ -129,6 +128,8 @@ def home(request):
 
         # Increment page number for the next iteration
         page_number += 1
+
+        
 
     # Prepare download URLs for each movie
     for movie in all_movies:
@@ -156,6 +157,7 @@ def home(request):
     # print(movies)
 
     report_graph_path = None
+    
 
     return render(request, 'index.html', {
         'movies': page_obj, 
