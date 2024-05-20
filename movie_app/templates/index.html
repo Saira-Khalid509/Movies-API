@@ -1,11 +1,12 @@
 {% load static %}
-{% load pagination_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movies List</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +19,7 @@
             height: 100%;
             position: fixed;
             top: 0;
-            left: 0;    
+            left: 0;
             padding: 30px 15px;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(5px);
@@ -42,84 +43,32 @@
             font-size: 15px;
             display: inline-block;
         }
-        .movie-list {
-            list-style: none;
-            padding: 0;
-            margin-left: 40px;
-        }
-        .movie-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 20px;
-            background-color: #ffffffbe;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            position: relative;
-        }
-        
-
-        .movie-image {
-            margin-right: 20px;
-            width: 150px;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        .movie-details {
-            flex-grow: 1;
-        }
-        .movie-details h2 {
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 10px;
-            
-        }
-        .movie-details p {
-            margin-top: 5px;
-            margin-bottom: 5px;
-            color: #666;
-        }
-        .movie-link {
-            text-decoration: none; 
-            color: inherit; 
-        }
-        
-    </style>
-
-
-
-
-
-<style>
-    .container {
-            max-width: 800px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            
+            padding-left: 180px; /* Add margin to accommodate the sidebar */
         }
         h1 {
             color: #333;
             text-align: center;
         }
         .filters {
-        display: flex;
-        justify-content: flex-end; /* Align buttons to the end of the container */
-        align-items: center;
-        margin-bottom: 30px;
-    }
-       
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 30px;
+        }
         .filters select, .filters button {
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
             background-color: #fff;
             font-size: 16px;
-            margin-left: 5px; /* Add margin between the select and button */
+            margin-left: 5px;
         }
         .filters button {
-            padding: 10px 20px; /* Adjust padding for the buttons */
+            padding: 10px 20px;
             margin-left: 10px; 
             background-color: #007bff;
             color: #fff;
@@ -128,12 +77,183 @@
             transition: background-color 0.3s;
         }
         .filters button:hover {
-            background-color: #0057b328;
+            background-color: #0057b3;
+        }
+        .slider {
+            margin-top: 20px;
+        }
+        .slider .slick-slide {
+            display: flex;
+            align-items: center;
+            background-color: #ffffffbe;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+        }
+        
+        .movie-image {
+            margin-right: 20px;
+            width: 200px; /* Adjust width to make the image larger */
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .movie-details {
+            flex-grow: 1;
+        }
+        .movie-details h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .movie-details p {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .movie-grid p {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .movie-link {
+            text-decoration: none; 
+            color: inherit; 
+        }
+        .buttons {
+            display: flex;
+        }
+        .download-button {
+            display: inline-block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: black;
+            border-radius: 5px;
+            margin-right: 10px;
+            background-color: #949090c9;
+
+        }
+        .movie-grid .download-button {
+            display: inline-block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: black;
+            border-radius: 5px;
+            margin-right: 10px;
+            background-color: #949090c9;
+        }
+        .download-button:hover {
+            background-color: #f2f2f2;
+        }
+        .movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust item size */
+    gap: 20px;
+    justify-content: center; /* Center items horizontally */
+    padding: 20px; /* Add some padding around the grid */
+}
+
+.movie-grid .movie-item {
+    background-color: #ffffffbe;
+    border-radius: 10px; /* Slightly increase border radius for a softer look */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhance box shadow for depth */
+    padding: 20px; /* Increase padding for better spacing */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.3s ease; /* Add smooth transition for hover effect */
+}
+
+.movie-grid .movie-item:hover {
+    transform: translateY(-5px); /* Add a slight lift effect on hover */
+}
+
+.movie-grid .movie-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px; /* Match border radius with container */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow to images */
+    transition: transform 0.3s ease; /* Add smooth transition for hover effect */
+}
+
+.movie-grid .movie-item:hover img {
+    transform: scale(1.1); /* Scale up image slightly on hover */
+}
+
+
+
+        .pagination {
+            position: fixed;
+            right: 0%; /* Center horizontally */
+            bottom: 0px; /* Adjust as needed */
+            /* transform: translateX(-50%); Center horizontally */
+            width: auto;
+            background-color: #f9f9f9;
+            padding: 10px 0;
+            text-align: center;
+            border-radius: 5px;
         }
 
-</style>
+        .pagination a,
+        .pagination .current,
+        .pagination span {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: black;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin: 0 4px;
+        }
+
+        .pagination a:hover {
+            background-color: #f2f2f2;
+        }
+        .movie-grid .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+        /* Add styling for the small-button class */
+.small-button {
+    width: 120px; /* Adjust the width as needed */
+    height: 30px; /* Adjust the height as needed */
+    font-size: 14px; /* Adjust the font size as needed */
+    background-color: #8e948e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px; 
+}
+
+/* Add space between buttons */
+.small-button + .small-button {
+    margin-top: 5px; /* Adjust as needed */
+}
+
+
+.small-button:hover {
+    background-color: #777e77;
+}
+
+    </style>
 </head>
 <body>
+    <div class="sidebar">
+        <ul>
+            <li><img src="{% static 'images/top.png' %}"><a href="#">Top Rated Movies</a></li>
+            <li><img src="{% static 'images/soon.png' %}"><a href="#">Coming Soon</a></li>
+            <li><img src="{% static 'images/new.png' %}"><a href="#">New Releases</a></li>
+            <li><img src="{% static 'images/fav.png' %}"><a href="#">Favorites</a></li>
+            <li><img src="{% static 'images/later.png' %}"><a href="#">Watch Later</a></li>
+            <li><img src="{% static 'images/report_gen.png' %}"><a href="{% url 'report' %}">Report</a></li>
+            <li><img src="{% static 'images/logout.png' %}"><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </div>
     <div class="container">
         <div class="filters">
             <select id="genre-filter">
@@ -150,249 +270,95 @@
             </select>
             <button onclick="applyFilters()">Apply Filters</button>
         </div>
-        <script>
-            function applyFilters() {
-                // Get selected values from the dropdowns
-                const genre = document.getElementById('genre-filter').value;
-                const year = document.getElementById('year-filter').value;
-        
-                // Create an AJAX request
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', `/filter_movies/?genre=${genre}&year=${year}`, true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            const movies = JSON.parse(xhr.responseText);
-                            displayMovies(movies);
-                        } else {
-                            console.error('Error fetching movies:', xhr.status);
-                        }
-                    }
-                };
-                xhr.send();
-            }
-        
-            // Function to display movies in the list
-            function displayMovies(movies) {
-                const moviesList = document.querySelector('.movie-list');
-                moviesList.innerHTML = ''; // Clear existing movie list
-                movies.forEach(function (movie) {
-                    const li = document.createElement('li');
-                    li.className = 'movie-item';
-                    li.innerHTML = `
-                        <img src="${movie.medium_cover_image}" alt="${movie.title} Cover" class="movie-image">
-                        <div class="movie-details">
-                            <h2>${movie.title}</h2>
-                            <p><strong>Year:</strong> ${movie.year}</p>
-                            <p><strong>Rating:</strong> ${movie.rating}</p>
-                            <p><strong>Genre:</strong> ${movie.genres.join(", ")}</p>
-                            <p><strong>Size:</strong> ${movie.size}</p>
-                            <p><strong>Date Uploaded:</strong> ${movie.date_uploaded}</p>
-                            <p><strong>Quality:</strong> ${movie.quality}</p>
-                            <p><strong>Runtime:</strong> ${movie.runtime}</p>
-                            <p><strong>Summary:</strong> ${movie.summary}</p>
-                            <div class="buttons">
-                                <a href="${movie.watch_url}" class="watch-button">Watch Online</a>
-                                <a href="${movie.download_url}" class="download-button" download="${movie.title}.mp4">Download</a>
-                            </div>
-                        </div>
-                    `;
-                    moviesList.appendChild(li);
-                });
-            }
-        </script>
-        
-
-
-
-
-
-
-
-        <div class="sidebar">
-            <!-- <h2>Sidebar</h2> -->
-            <ul>
-                <li><img src="{% static 'images/top.png' %}"><a href="#">Top Rated Movies</a></li>
-                <li><img src="{% static 'images/soon.png' %}"><a href="#">Coming Soon</a></li>
-                <li><img src="{% static 'images/new.png' %}"><a href="#">New Releases</a></li>
-                <li><img src="{% static 'images/fav.png' %}"><a href="#">Favorites</a></li>
-                <li><img src="{% static 'images/later.png' %}"><a href="#">Watch Later</a></li>
-                <li><img src="{% static 'images/report_gen.png' %}"><a href="{% url 'report' %}">Report</a></li>
-                <li><img src="{% static 'images/logout.png' %}"><a href="{% url 'logout' %}">Logout</a></li>
-            </ul>
-        </div>
-
-<style>
-    .buttons {
-    display: flex;
-        }
-
-        .watch-button,
-        .download-button {
-            display: inline-block;
-            padding: 8px 16px;
-            text-decoration: none;
-            color: black;
-            border-radius: 5px;
-            margin-right: 10px;
-            background-color: #949090c9;
-        }
-
-        .watch-button:hover,
-        .download-button:hover {
-            background-color: #f2f2f2;
-        }
-
-</style>
-
-
-
-
-
-        <ul class="movie-list">
-            {% for movie in movies %}
-                <li class="movie-item">
-                    
-                        <img src="{{ movie.medium_cover_image }}" alt="{{ movie.title }} Cover" class="movie-image">
-                                       <div class="movie-details">
-                        <h2><a href="{{ movie.url }}">{{ movie.title }}</a></h2>
+        <div class="slider">
+            {% for movie in movies|slice:":4" %}
+                <div class="movie-item">
+                    <img src="{{ movie.medium_cover_image }}" alt="{{ movie.title }} Cover" class="movie-image">
+                    <div class="movie-details">
+                        <h2>{{ movie.title }}</h2>
                         <p><strong>Year:</strong> {{ movie.year }}</p>
                         <p><strong>Rating:</strong> {{ movie.rating }}</p>
                         <p><strong>Genre:</strong> {{ movie.genres |join:", " }}</p>
-                        <p><strong>Size:</strong> {{ movie.size  }}</p>
                         <p><strong>Date Uploaded:</strong> {{ movie.date_uploaded }}</p>
-                        <!-- <p><strong>Quality:</strong> {{ movie.quality }}</p> -->
                         <p><strong>Runtime:</strong> {{ movie.runtime }}</p>
-                        <p><strong>Summary:</strong> {{ movie.summary }}</p>
+                        <!-- <p><strong>Summary:</strong> {{ movie.summary }}</p> -->
                         <div class="buttons">
-                            <!-- print(movie.hash) -->
                             {% if movie.torrents %}
                                 {% for torrent in movie.torrents %}
                                 <a href="https://yts.mx/torrent/download/{{ torrent.hash }}" class="download-button">Download {{ torrent.quality }} ({{ torrent.size }})</a>
-                                <!-- <p><strong>Size:</strong> {{ movie.size  }}</p> -->
-
                                 {% endfor %}
                             {% endif %}
-                            <!-- https://yts.mx/torrent/download/{movie.hash} -->
                         </div>
                     </div>
-                </li>
+                </div>
             {% endfor %}
-        </ul>
-    </div>
-
-
-
-
-
-
-
-
-
-<style>
-    .pagination {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.pagination {
-    position: fixed;
-    right: 0%; /* Center horizontally */
-    bottom: 0px; /* Adjust as needed */
-    /* transform: translateX(-50%); Center horizontally */
-    width: auto;
-    background-color: #f9f9f9;
-    padding: 10px 0;
-    text-align: center;
-    border-radius: 5px;
-}
-
-.pagination a,
-.pagination .current,
-.pagination span {
-    padding: 8px 16px;
-    text-decoration: none;
-    color: black;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    margin: 0 4px;
-}
-
-.pagination a:hover {
-    background-color: #f2f2f2;
-}
-</style>
-    <div class="pagination" style="text-align: right;">
-        <span class="step-links">
-            {% if movies.has_previous %}
-                <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ movies.previous_page_number }}">previous</a>
-            {% endif %}
-    
-            <span class="current">
-                Page {{ movies.number }} of {{ movies.paginator.num_pages }}.
+        </div>
+        <div class="movie-grid">
+            {% for movie in movies %}
+                <div class="movie-item">
+                    <img src="{{ movie.medium_cover_image }}" alt="{{ movie.title }} Cover">
+                    <h2>{{ movie.title }}</h2>
+                    <p><strong>Year:</strong> {{ movie.year }}</p>
+                    <p><strong>Rating:</strong> {{ movie.rating }}</p>
+                    <p><strong>Genre:</strong> {{ movie.genres | join:", " }}</p>
+                    <div class="buttons">
+                        {% if movie.torrents %}
+                            {% for torrent in movie.torrents %}
+                                <a href="https://yts.mx/torrent/download/{{ torrent.hash }}" class="download-button small-button">Download {{ torrent.quality }} ({{ torrent.size }})</a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="pagination" style="text-align: right;">
+            <span class="step-links">
+                {% if movies.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ movies.previous_page_number }}">previous</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ movies.number }} of {{ movies.paginator.num_pages }}.
+                </span>
+        
+                {% if movies.has_next %}
+                    <a href="?page={{ movies.next_page_number }}">next</a>
+                    <a href="?page={{ movies.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
             </span>
-    
-            {% if movies.has_next %}
-                <a href="?page={{ movies.next_page_number }}">next</a>
-                <a href="?page={{ movies.paginator.num_pages }}">last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
+        </div>
 
-
-
-
-
-        <script>
-            // Function to fetch genres from backend and populate dropdown
-            function fetchGenres() {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/genres/', true);  // URL should point to your Django view that returns genres
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            var genres = JSON.parse(xhr.responseText);
-                            populateDropdown('genre-filter', genres);
-                        } else {
-                            console.error('Error fetching genres:', xhr.status);
-                        }
-                    }
-                };
-                xhr.send();
-            }
-    
-            // Function to fetch and populate sort options
-            function fetchSortOptions() {
-                var sortOptions = ['Year', 'Rating']; // Example sort options
-                populateDropdown('sort-by', sortOptions);
-            }
-    
-            // Function to populate a dropdown menu with options
-            function populateDropdown(elementId, options) {
-                var dropdown = document.getElementById(elementId);
-                options.forEach(function(option) {
-                    var optionElement = document.createElement('option');
-                    optionElement.value = option.toLowerCase();
-                    optionElement.textContent = option;
-                    dropdown.appendChild(optionElement);
-                });
-            }
-            
-            // Fetch genres and sort options when page loads
-            fetchGenres();
-            fetchSortOptions();
-        </script>
-    
-
-        <script>
-            // Toggle dropdown menu visibility on button click
-            document.querySelectorAll('.dropdown').forEach(function(dropdown) {
-                dropdown.addEventListener('click', function(event) {
-                    var dropdownContent = dropdown.querySelector('.dropdown-content');
-                    dropdownContent.style.display = (dropdownContent.style.display === 'block') ? 'none' : 'block';
-                });
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('.slider').slick({
+                infinite: true,
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                dots: true,
+                arrows: true
             });
-        </script>   
+        });
+
+        function applyFilters() {
+            var genre = document.getElementById('genre-filter').value;
+            var year = document.getElementById('year-filter').value;
+            var url = new URL(window.location.href);
+            if (genre) {
+                url.searchParams.set('genre', genre);
+            } else {
+                url.searchParams.delete('genre');
+            }
+            if (year) {
+                url.searchParams.set('year', year);
+            } else {
+                url.searchParams.delete('year');
+            }
+            window.location.href = url.toString();
+        }
+    </script>
 </body>
 </html>
